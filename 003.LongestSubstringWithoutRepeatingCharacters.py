@@ -24,51 +24,28 @@ class Solution(object):
         """
         :type s: str
         :rtype: int
-        Solution: Greedy
+        Solution:
         """
-# this is my first submition.
-# in fact, wi stores some consecutive numbers
-#         res = 0
-#         wi = {} # store the index
-#         last = ""
-#         for i in range(0, len(s)):
-#             if s[i] == last:
-#                 wi.clear()
-#                 wi[s[i]] = i
-#             else:
-#                 if s[i] in wi:
-#                     idx = wi[s[i]]
-#                     wi.clear()
-#                     for k in range(idx + 1, i + 1):
-#                         wi[s[k]] = k
-#                 else:
-#                     wi[s[i]] = i
-#                     
-#             if res < len(wi):
-#                 res = len(wi)
-#             last = s[i]
-#         return res
-
-        res = 0
-        wl = 0 # left index
-        wr = 0 # right index
-        wi = {}
-        last = ""
-        for i in range(0, len(s)):
-            if s[i] == last:
-                wl = i
+        if not s:
+            return 0
+        f = [0] * len(s)
+        f[0] = 1
+        last = {}
+        last[s[0]] = 0
+        # best = s[0]
+        for i in range(1, len(s)):
+            if s[i] not in last or last[s[i]] < i - f[i - 1]:
+                f[i] = f[i - 1] + 1
             else:
-                if s[i] in wi and wi[s[i]] <= wr and wi[s[i]] >= wl:
-                    wl = wi[s[i]] + 1
-                  
-            wi[s[i]] = i
-            wr = i
-                    
-            if res < wr - wl + 1:
-                res = wr - wl + 1
-            last = s[i]
-        return res
-                
-                
-                
-            
+                f[i] = i - last[s[i]]
+            # if f[i] > len(best):
+            #    best = s[i - f[i] + 1: i + 1]
+            last[s[i]] = i
+
+        return max(f)
+
+
+if __name__ == '__main__':
+    import sys
+    sol = Solution()
+    print sol.lengthOfLongestSubstring(sys.argv[1])
