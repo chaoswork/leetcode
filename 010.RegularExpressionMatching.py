@@ -27,73 +27,73 @@
 
 
 class Solution(object):
+    def match(self, s, j, p, i):
+        """
+        dp
+        """
+        if i == len(p) and j == len(s):
+            return 1
+        if i == len(p) or j == len(s):
+            return 0
+        # print i, j, Solution.buff[i][j], s[j:], p[i:]
+
+        if Solution.buff[i][j] != -1:
+            return Solution.buff[i][j]
+        if p[i] == '.' or s[j] == p[i]:
+            # print 'debug-equal'
+            if self.match(s, j + 1, p, i + 1) == 1:
+                Solution.buff[i][j] = 1
+                return 1
+
+        if p[i] == '*':
+            # match zero prev
+            # print 'debug-match zero'
+            if self.match(s, j, p, i + 1) == 1:
+                Solution.buff[i][j] = 1
+                return 1
+            if i > 0:
+                prev = p[i - 1]
+                if prev == '.':
+                    # print 'debug: prev = .'
+                    for jj in range(j, len(s)):
+                        if self.match(s, jj + 1, p, i + 1) == 1:
+                            Solution.buff[i][j] = 1
+                            return Solution.buff[i][j]
+                else:
+                    # print 'debug: prev = ', prev
+                    for jj in range(j, len(s)):
+                        if s[jj] == prev:
+                            if self.match(s, jj + 1, p, i + 1) == 1:
+                                Solution.buff[i][j] = 1
+                                return Solution.buff[i][j]
+                        else:
+                            break
+        if i < len(p) - 1 and p[i + 1] == '*':
+            return self.match(s, j, p, i + 2)
+
+        Solution.buff[i][j] = 0
+        return 0
+
     def isMatch(self, s, p):
         """
         :type s: str
         :type p: str
         :rtype: bool
+        if a[i] == '.*' match(i + 2, j...)
+        if a[i] == '.' match(i + 1, j + 1)
+        if a[i] == other, if same, match(i + 1, j + 1)
+        if a[i] == '*', match(i+1, prev...)
         """
-        pattern = []
-        for i in range(0, len(p)):
-            if i + 1 < len(p) and p[i + 1] == '*':
-                pattern.append(p[i: i + 2])
-                continue
-            if p[i] == '*':
-                continue
-            pattern.append(p[i])
-        new_p = []
-        for item in pattern:
-            if len(item) == 2:
-                if len(new_p) and len(new_p[-1]) == 2:
-                    if new_p[-1] == item:
-                        continue
-            new_p.append(item)
-        # print ''.join(new_p)
-        return self.match_here(s, ''.join(new_p))
-
-    def match_here(self, s, p):
-        """
-        从当前开始匹配
-        """
-        # print 'debug-here: s=%s,p=%s' % (s, p)
-        if s == "" and p == "":
-            return True
-
-        if len(p) > 1 and p[1] == '*':
-            return self.match_star(p[0], p[2:], s)
-
-        if len(s) and len(p) and (s[0] == p[0] or p[0] == '.'):
-            return self.match_here(s[1:], p[1:])
-
-        return False
-
-    def match_star(self, cur, rest_p, s):
-        """
-        匹配 x*
-        """
-        # print 'debug-star:[cur=%s,rest_p=%s,s=%s]' % (cur, rest_p, s)
-        if rest_p == "" and s == "":
-            return True
-        if cur == '.':
-            for i in range(0, len(s) + 1):
-                if self.match_here(s[i:], rest_p):
-                    return True
-        else:
-            # 找到第一个不是cur的坐标
-            cur_index = 0
-            while cur_index < len(s) and s[cur_index] == cur:
-                # print 'debug,i=', i, cur, s[i]
-                cur_index += 1
-            # print 'debug, cur_index=%d' % cur_index
-            for i in range(0, cur_index + 1):
-                # print 'debug: s[i:]=%s,rest_p=%s' % (s[i:], rest_p)
-                if self.match_here(s[i:], rest_p):
-                    return True
-        return False
+        s = 'A' + s + 'B'
+        p = 'A' + p + 'B'
+        Solution.buff = [[-1 for j in range(len(s))] for i in range(len(p))]
+        print '---', s, len(s), p, len(p)
+        return self.match(s, 0, p, 0) == 1
 
 
 if __name__ == '__main__':
     sol = Solution()
+    print sol.isMatch("ab", ".*c") is False
     print sol.isMatch("aa", "a") is False
     print sol.isMatch("aa", "aa") is True
     print sol.isMatch("aaa", "aa") is False
