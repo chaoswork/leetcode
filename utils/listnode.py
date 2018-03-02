@@ -21,6 +21,15 @@ class ListNode(object):
             cur = cur.next
         print 'None'
 
+    def __str__(self):
+        cur = self
+        result = ''
+        while cur:
+            result = ''.join([result, str(cur.val), '->'])
+            cur = cur.next
+        result += 'None'
+        return result
+
 
 def buildList(ls):
     """
